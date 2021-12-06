@@ -13,6 +13,7 @@ public class PlayerMovement : MonoBehaviour
     // a circle has 2 pi, approx 6, turnspeed=3 means it takes 1 sec to turn around
     public float turnSpeed = 20f;
     public float moveSpeed = 0.06f;
+    public bool IsAttacking = false;
     // Start is called before the first frame update
     void Start()
     {
@@ -39,6 +40,15 @@ public class PlayerMovement : MonoBehaviour
         bool isWalking = hasHorizontalInput || hasVerticalInput;
 
         m_Animator.SetBool("IsWalking", isWalking);
+
+
+        if (Input.GetKeyDown(KeyCode.F))
+        {
+            IsAttacking = true;
+            Invoke("ResetIsAttacking", 0.8f);
+        }
+
+        m_Animator.SetBool("IsAttacking", IsAttacking);
         //Debug.Log(isWalking);
 
         //generate the rotation vector: needs to time speed by delta time, bc this line gets called 60 times
@@ -51,6 +61,10 @@ public class PlayerMovement : MonoBehaviour
 
     }
 
+    private void ResetIsAttacking()
+    {
+        IsAttacking = false;
+    }
     //allows you to apply root motion as you want,
     //which means that movement and rotation can be applied separately.
     private void OnAnimatorMove()
@@ -61,4 +75,20 @@ public class PlayerMovement : MonoBehaviour
         m_Rigidbody.MovePosition(m_Rigidbody.position + m_Movement * moveSpeed);
         m_Rigidbody.MoveRotation(m_Rotation);
     }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+
+        if (collision.gameObject.name == "Plane")
+        {
+
+           Destroy(this.gameObject);
+            //todo: change this to the restart menu
+
+            Debug.Log("you've lost");
+
+        }
+
+    }
+
 }
